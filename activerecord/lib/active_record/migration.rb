@@ -391,7 +391,7 @@ module ActiveRecord
 
       def load_schema_if_pending!
         if ActiveRecord::Migrator.needs_migration?
-          ActiveRecord::Tasks::DatabaseTasks.load_schema
+          ActiveRecord::Tasks::DatabaseTasks.load_schema_current
           check_pending!
         end
       end
@@ -826,21 +826,20 @@ module ActiveRecord
         SchemaMigration.table_name
       end
 
-      def get_all_versions
-        SchemaMigration.all.map { |x| x.version.to_i }.sort
-      end
-
-      def current_version(connection = Base.connection)
-        sm_table = schema_migrations_table_name
-        if connection.table_exists?(sm_table)
-          get_all_versions.max || 0
+      def get_all_versions(connection = Base.connection)
+        if connection.table_exists?(schema_migrations_table_name)
+          SchemaMigration.all.map { |x| x.version.to_i }.sort
         else
-          0
+          []
         end
       end
 
+      def current_version(connection = Base.connection)
+        get_all_versions(connection).max || 0
+      end
+
       def needs_migration?(connection = Base.connection)
-        current_version(connection) < last_version
+        (migrations(migrations_paths).collect(&:version) - get_all_versions(connection)).size > 0
       end
 
       def last_version

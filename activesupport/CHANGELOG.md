@@ -1,3 +1,8 @@
+*   `Method` objects now report themselves as not `duplicable?`. This allows
+    hashes and arrays containing `Method` objects to be `deep_dup`ed.
+
+    *Peter Jaros*
+
 *   Fix DateTime comparison with DateTime::Infinity object.
 
     *Rafael Mendonça França*
@@ -25,6 +30,11 @@
     See #15379.
 
     *Juanjo Bazán*
+
+
+## Rails 4.1.5 (August 18, 2014) ##
+
+*   No changes.
 
 
 ## Rails 4.1.4 (July 2, 2014) ##
